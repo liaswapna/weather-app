@@ -2,6 +2,7 @@ import httpx
 from typing import Optional
 from config import Config
 from models import CurrentWeather, Forecast, ForecastDay
+from cache import CacheManager
 
 
 class WeatherService:
@@ -10,6 +11,7 @@ class WeatherService:
     def __init__(self):
         self.geocodingUrl = Config.OPEN_METEO_GEOCODING_URL
         self.forecastUrl = Config.OPEN_METEO_FORECAST_URL
+        self.coordinatesCache = CacheManager(Config.CACHE_DURATION)
 
     async def makeApiRequest(self, url: str, params: dict) -> dict:
         """
@@ -39,6 +41,11 @@ class WeatherService:
             Dictionary with latitude, longitude, and name, or None if not found
         """
 
+        # Check cache first
+        cachedCoordinates = self.coordinatesCache.get(city)
+        if cachedCoordinates:
+            return cachedCoordinates
+
         params = {"name": city, "count": 1, "language": "en"}
         data = await self.makeApiRequest(self.geocodingUrl, params)
 
@@ -46,11 +53,16 @@ class WeatherService:
             return None
 
         result = data["results"][0]
-        return {
+        coordinates = {
             "latitude": result["latitude"],
             "longitude": result["longitude"],
             "name": city
         }
+
+        # Store in cache
+        self.coordinatesCache.set(city, coordinates)
+
+        return coordinates
 
     def getWeatherCondition(self, weatherCode: int) -> str:
         """
