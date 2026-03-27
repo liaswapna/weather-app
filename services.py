@@ -1,8 +1,14 @@
 import httpx
+import time
+import logging
 from typing import Optional
 from config import Config
 from models import CurrentWeather, Forecast, ForecastDay
 from cache import CacheManager
+
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 
 class WeatherService:
@@ -24,9 +30,16 @@ class WeatherService:
         Returns:
             JSON response as dictionary
         """
+        logger.debug(f"API Request: {url} with params: {params}")
+        startTime = time.time()
+
         async with httpx.AsyncClient() as client:
             response = await client.get(url, params=params)
             data = response.json()
+
+        elapsed = time.time() - startTime
+        logger.info(f"✓ API Response: Status 200 in {elapsed:.2f}s")
+        logger.debug(f"Response data keys: {list(data.keys())}")
 
         return data
 
@@ -40,16 +53,20 @@ class WeatherService:
         Returns:
             Dictionary with latitude, longitude, and name, or None if not found
         """
+        logger.info(f"Fetching coordinates for city: {city}")
 
         # Check cache first
         cachedCoordinates = self.coordinatesCache.get(city)
         if cachedCoordinates:
+            logger.info(f"✓ Cache hit for coordinates: {city}")
             return cachedCoordinates
 
+        logger.info(f"Cache miss for coordinates: {city}, calling API...")
         params = {"name": city, "count": 1, "language": "en"}
         data = await self.makeApiRequest(self.geocodingUrl, params)
 
         if not data.get("results"):
+            logger.warning(f"City not found: {city}")
             return None
 
         result = data["results"][0]
@@ -61,6 +78,7 @@ class WeatherService:
 
         # Store in cache
         self.coordinatesCache.set(city, coordinates)
+        logger.info(f"✓ Coordinates cached for: {city}")
 
         return coordinates
 
@@ -108,18 +126,24 @@ class WeatherService:
         Returns:
             CurrentWeather object with temperature, condition, humidity, windspeed
         """
+        logger.info(
+            f"Fetching weather for: {cityName} (lat: {latitude}, lon:{longitude})")
+
         params = {
             "latitude": latitude,
             "longitude": longitude,
             "current": "temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m"
         }
 
+        logger.debug(f"Calling weather API with params: {params}")
         data = await self.makeApiRequest(self.forecastUrl, params)
 
         current = data.get("current")
         if not current:
+            logger.error(f"Failed to fetch weather data for: {cityName}")
             return None
 
+        logger.info(f"✓ Weather data retrieved for: {cityName}")
         return CurrentWeather(
             city=cityName,
             temperature=current["temperature_2m"],
@@ -140,18 +164,25 @@ class WeatherService:
         Returns:
             Forecast object containing 7 days of weather data
         """
+
+        logger.info(
+            f"Fetching forecast for: {cityName} (lat: {latitude}, lon:{longitude})")
         params = {
             "latitude": latitude,
             "longitude": longitude,
             "daily": "weather_code,temperature_2m_max,temperature_2m_min"
         }
 
+        logger.debug(f"Calling forecast API with params: {params}")
         data = await self.makeApiRequest(self.forecastUrl, params)
         if not data.get("daily") or not data["daily"].get("time"):
+            logger.warning(f"No forecast data available for: {cityName}")
             return Forecast(city=cityName, days=[])
 
         daily = data["daily"]
         days = []
+        logger.info(
+            f"Processing {len(daily['time'])} days of forecast for:{cityName}")
         for day in range(len(daily["time"])):
             forecastDay = ForecastDay(
                 date=daily["time"][day],
@@ -161,6 +192,7 @@ class WeatherService:
             )
             days.append(forecastDay)
 
+        logger.info(f"✓ Forecast data retrieved for: {cityName}")
         return Forecast(
             city=cityName,
             days=days
