@@ -1,6 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from services import WeatherService
 from models import CurrentWeather, Forecast
+import logging
+
+# Configure logging to show INFO level and above
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -47,7 +54,8 @@ async def getWeatherEndPoint(city: str):
     )
 
     if not weather:
-        raise HTTPException(status_code=500, detail="Failed to fetch weather data")
+        raise HTTPException(
+            status_code=500, detail="Failed to fetch weather data")
 
     return weather
 
