@@ -1,8 +1,15 @@
 from datetime import timedelta
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class Config:
     """Application configuration - centralized settings for the weather app wrapper"""
+    # Environment settings
+    ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+    DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 
     # Cache settings
     # How long to keep cached weather databefore refreshing
