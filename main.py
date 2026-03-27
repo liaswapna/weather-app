@@ -1,19 +1,18 @@
 from fastapi import FastAPI, HTTPException
 from services import WeatherService
 from models import CurrentWeather, Forecast
-import logging
+from config import Config
+from logging_config import configureLogging
 
-# Configure logging to show INFO level and above
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# Configure logging based on environment
+configureLogging()
 
 # Initialize FastAPI app
 app = FastAPI(
     title="Weather App",
     description="A simple weather API wrapper using Open-Meteo",
-    version="1.0.0"
+    version="1.0.0",
+    debug=Config.DEBUG
 )
 
 # Initialize the weather service
