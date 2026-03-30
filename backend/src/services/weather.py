@@ -2,9 +2,9 @@ import httpx
 import time
 import logging
 from typing import Optional
-from config import Config
-from models import CurrentWeather, Forecast, ForecastDay
-from cache import CacheManager
+from src.core.config import Config
+from src.schemas.weather import CurrentWeather, Forecast, ForecastDay
+from src.utils.cache import CacheManager
 
 
 # Configure logger
