@@ -6,65 +6,66 @@ import { SearchBar, WeatherCard, ForecastCard } from './components/Weather';
 import { LoadingSpinner, ErrorDisplay, ErrorBoundary } from './components/common';
 
 const App: React.FC = () => {
-  // Initialize services with useMemo to avoid recreating on every render
   const services = useMemo(() => {
     const apiClient = new ApiClient('http://localhost:8000');
     const weatherService = new WeatherService(apiClient);
     return { apiClient, weatherService };
   }, []);
 
-  // Use the weather hook with the weather service
   const { state, searchWeather, isLoading, error, clearError } = useWeather(
     services.weatherService
   );
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gray-100">
+      <div style={{ background: 'linear-gradient(to bottom right, #0f172a, #1e3a8a, #0f172a)', minHeight: '100vh', display: 'flex', flexDirection: 'column', margin: 0, padding: 0 }}>
         {/* Header */}
-        <header className="bg-blue-600 text-white py-6 shadow-md">
-          <div className="container mx-auto">
-            <h1 className="text-4xl font-bold">Weather App</h1>
-            <p className="text-blue-100 mt-2">Get weather for any city worldwide</p>
+        <header style={{ background: 'linear-gradient(to right, #2563eb, #1d4ed8, #1e40af)', color: 'white', padding: '0.8rem', boxShadow: '0 20px 25px rgba(0,0,0,0.1)', flexShrink: 0, margin: 0 }}>
+          <div style={{ maxWidth: '100%', margin: '0', paddingLeft: '0.8rem', paddingRight: '0.8rem' }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0 0 0.6rem 0' }}>🌍 Weather App</h1>
+            <div style={{
+              background: 'rgba(255,255,255,0.15)',
+              borderRadius: '12px',
+              padding: '0.9rem',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}>
+              <p style={{ fontSize: '1.1rem', fontWeight: 'bold', margin: '0 0 0.2rem 0' }}>
+                👋 Welcome!
+              </p>
+              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.95)', margin: '0 0 0.4rem 0' }}>
+                Get real-time weather updates
+              </p>
+              <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.9)', margin: '0' }}>
+                🔍 Search for a city below to see its current weather and 7-day forecast
+              </p>
+            </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="container mx-auto py-8 px-4">
-          {/* Loading Spinner - Show while fetching */}
-          {isLoading && <LoadingSpinner message="Fetching weather data..." />}
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', paddingLeft: '0.5rem', paddingRight: '0.5rem', paddingTop: '0.8rem', paddingBottom: '0.8rem', margin: 0, background: 'transparent' }}>
+          {/* Centered Search Section */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem', flexShrink: 0 }}>
+            <div style={{ width: '100%', maxWidth: '26rem', paddingLeft: '0.3rem', paddingRight: '0.3rem' }}>
+              <SearchBar onSearch={searchWeather} loading={isLoading} />
 
-          {/* Error Display - Show if there's an error */}
-          {error && !isLoading && (
-            <ErrorDisplay error={error} onDismiss={clearError} />
-          )}
+              {isLoading && <LoadingSpinner message="Fetching weather data..." />}
 
-          {/* Search Bar */}
-          <div className="mb-8">
-            <SearchBar onSearch={searchWeather} loading={isLoading} />
-          </div>
-
-          {/* Weather Display - Show current weather and forecast if available */}
-          {!isLoading && (
-            <>
-              {state.current ? (
-                <div className="space-y-6">
-                  {/* Current Weather Card */}
-                  <WeatherCard weather={state.current} />
-
-                  {/* Forecast Card */}
-                  {state.forecast && <ForecastCard forecast={state.forecast} />}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">
-                    Search for a city to see its weather
-                  </p>
-                </div>
+              {error && !isLoading && (
+                <ErrorDisplay error={error} onDismiss={clearError} />
               )}
-            </>
-          )}
-        </main>
+            </div>
+          </div>
+        </div>
+
+        {/* Weather Results */}
+        {!isLoading && state.current && (
+          <div style={{ width: '100%', margin: '0', paddingLeft: '0.5rem', paddingRight: '0.5rem', paddingTop: '0.3rem', boxSizing: 'border-box', overflow: 'hidden' }}>
+            <WeatherCard weather={state.current} />
+            {state.forecast && <ForecastCard forecast={state.forecast} />}
+          </div>
+        )}
       </div>
     </ErrorBoundary>
   );
