@@ -1,25 +1,15 @@
-from fastapi import FastAPI, HTTPException
-from services import WeatherService
-from models import CurrentWeather, Forecast
-from config import Config
-from logging_config import configureLogging
+from fastapi import HTTPException, APIRouter
+from src.services.weather import WeatherService
+from src.schemas.weather import CurrentWeather, Forecast
 
-# Configure logging based on environment
-configureLogging()
-
-# Initialize FastAPI app
-app = FastAPI(
-    title="Weather App",
-    description="A simple weather API wrapper using Open-Meteo",
-    version="1.0.0",
-    debug=Config.DEBUG
-)
+# Create router
+router = APIRouter()
 
 # Initialize the weather service
 weatherService = WeatherService()
 
 
-@app.get("/health")
+@router.get("/health")
 def healthCheck():
     """
     Health check endpoint to verify the API is running
@@ -30,7 +20,7 @@ def healthCheck():
     return {"status": "OK"}
 
 
-@app.get("/weather/{city}", response_model=CurrentWeather)
+@router.get("/weather/{city}", response_model=CurrentWeather)
 async def getWeatherEndPoint(city: str):
     """
     Get current weather for a city
@@ -59,16 +49,16 @@ async def getWeatherEndPoint(city: str):
     return weather
 
 
-@app.get("/forecast/{city}", response_model=Forecast)
+@router.get("/forecast/{city}", response_model=Forecast)
 async def getForecastEndpoint(city: str):
     """
-      Get 7-day weather forecast for a city
+        Get 7-day weather forecast for a city
 
-      Args:
-          city: City name (e.g., "London", "New York")
+        Args:
+            city: City name (e.g., "London", "New York")
 
-      Returns:
-          Forecast object containing 7 days of weather data
+        Returns:
+            Forecast object containing 7 days of weather data
     """
     coordinates = await weatherService.getCoordinates(city)
 

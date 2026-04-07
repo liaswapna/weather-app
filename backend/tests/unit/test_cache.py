@@ -1,7 +1,7 @@
 import pytest
 from datetime import timedelta, datetime
 from unittest.mock import patch
-from cache import CacheManager
+from src.utils.cache import CacheManager
 
 
 class TestCacheSet:

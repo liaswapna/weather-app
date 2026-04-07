@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import patch
-from main import app
+from src.main import app
 
 client = TestClient(app)
 
@@ -15,8 +15,8 @@ class TestHealthEndpoint:
 
 class TestWeatherEndpoint:
     def test_weather_success_returns_current_weather(self):
-        with patch("services.WeatherService.getCoordinates") as mockCoordinates, \
-             patch("services.WeatherService.getCurrentWeather") as mockWeather:
+        with patch("src.services.weather.WeatherService.getCoordinates") as mockCoordinates, \
+             patch("src.services.weather.WeatherService.getCurrentWeather") as mockWeather:
 
             mockCoordinates.return_value = {
                 "latitude": 51.5074,
@@ -39,7 +39,7 @@ class TestWeatherEndpoint:
             assert data["condition"] == "Cloudy"
 
     def test_weather_city_not_found_returns_404(self):
-        with patch("services.WeatherService.getCoordinates") as mockCoordinates:
+        with patch("src.services.weather.WeatherService.getCoordinates") as mockCoordinates:
             mockCoordinates.return_value = None
 
             response = client.get("/weather/InvalidCity")
@@ -47,8 +47,8 @@ class TestWeatherEndpoint:
             assert response.json()["detail"] == "City not found"
 
     def test_weather_api_failure_returns_500(self):
-        with patch("services.WeatherService.getCoordinates") as mockCoordinates, \
-             patch("services.WeatherService.getCurrentWeather") as mockWeather:
+        with patch("src.services.weather.WeatherService.getCoordinates") as mockCoordinates, \
+             patch("src.services.weather.WeatherService.getCurrentWeather") as mockWeather:
 
             mockCoordinates.return_value = {
                 "latitude": 51.5074,
@@ -64,8 +64,8 @@ class TestWeatherEndpoint:
 
 class TestForecastEndpoint:
     def test_forecast_success_returns_forecast_data(self):
-        with patch("services.WeatherService.getCoordinates") as mockCoordinates, \
-             patch("services.WeatherService.getForecast") as mockForecast:
+        with patch("src.services.weather.WeatherService.getCoordinates") as mockCoordinates, \
+             patch("src.services.weather.WeatherService.getForecast") as mockForecast:
 
             mockCoordinates.return_value = {
                 "latitude": 51.5074,
@@ -98,7 +98,7 @@ class TestForecastEndpoint:
             assert data["days"][0]["condition"] == "Sunny"
 
     def test_forecast_city_not_found_returns_404(self):
-        with patch("services.WeatherService.getCoordinates") as mockCoordinates:
+        with patch("src.services.weather.WeatherService.getCoordinates") as mockCoordinates:
             mockCoordinates.return_value = None
 
             response = client.get("/forecast/InvalidCity")
@@ -106,8 +106,8 @@ class TestForecastEndpoint:
             assert response.json()["detail"] == "City not found"
 
     def test_forecast_empty_data_returns_empty_days(self):
-        with patch("services.WeatherService.getCoordinates") as mockCoordinates, \
-             patch("services.WeatherService.getForecast") as mockForecast:
+        with patch("src.services.weather.WeatherService.getCoordinates") as mockCoordinates, \
+             patch("src.services.weather.WeatherService.getForecast") as mockForecast:
 
             mockCoordinates.return_value = {
                 "latitude": 51.5074,

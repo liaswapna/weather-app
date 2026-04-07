@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
-from services import WeatherService
-from models import CurrentWeather
+from src.services.weather import WeatherService
+from src.schemas.weather import CurrentWeather
 
 
 class TestGetWeatherCondition:
@@ -45,7 +45,7 @@ class TestGetCoordinates:
             ]
         }
 
-        with patch('services.WeatherService.makeApiRequest',
+        with patch('src.services.weather.WeatherService.makeApiRequest',
                    return_value=mockData):
             result = await service.getCoordinates("London")
 
@@ -60,7 +60,7 @@ class TestGetCoordinates:
         service = WeatherService()
         mockData = {"results": []}
 
-        with patch('services.WeatherService.makeApiRequest',
+        with patch('src.services.weather.WeatherService.makeApiRequest',
                    return_value=mockData):
             result = await service.getCoordinates("InvalidCity123")
 
@@ -80,7 +80,7 @@ class TestGetCoordinates:
             ]
         }
 
-        with patch('services.WeatherService.makeApiRequest',
+        with patch('src.services.weather.WeatherService.makeApiRequest',
                    return_value=mockData) as mockApi:
             # First call
             result1 = await service.getCoordinates("London")
@@ -109,7 +109,7 @@ class TestGetCurrentWeather:
             }
         }
 
-        with patch('services.WeatherService.makeApiRequest',
+        with patch('src.services.weather.WeatherService.makeApiRequest',
                    return_value=mockData):
             result = await service.getCurrentWeather(51.5, -0.1, "London")
 
@@ -126,7 +126,7 @@ class TestGetCurrentWeather:
         service = WeatherService()
         mockData = {"current": None}
 
-        with patch('services.WeatherService.makeApiRequest',
+        with patch('src.services.weather.WeatherService.makeApiRequest',
                    return_value=mockData):
             result = await service.getCurrentWeather(51.5, -0.1, "London")
 
@@ -149,7 +149,7 @@ class TestGetForecast:
             }
         }
 
-        with patch('services.WeatherService.makeApiRequest',
+        with patch('src.services.weather.WeatherService.makeApiRequest',
                    return_value=mockData):
             result = await service.getForecast(51.5, -0.1, "London")
 
@@ -165,7 +165,7 @@ class TestGetForecast:
         service = WeatherService()
         mockData = {"daily": None}
 
-        with patch('services.WeatherService.makeApiRequest',
+        with patch('src.services.weather.WeatherService.makeApiRequest',
                    return_value=mockData):
             result = await service.getForecast(51.5, -0.1, "London")
 
