@@ -114,7 +114,12 @@ class WeatherService:
         }
         return conditions.get(weatherCode, "Unknown")
 
-    async def getCurrentWeather(self, latitude: float, longitude: float, cityName: str) -> CurrentWeather:
+    async def getCurrentWeather(
+        self,
+        latitude: float,
+        longitude: float,
+        cityName: str,
+    ) -> CurrentWeather:
         """
         Fetch current weather data for given coordinates
 
