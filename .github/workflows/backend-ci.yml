@@ -1,0 +1,41 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main, feature/**]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          cd backend
+          pytest tests/ -v
+
+      - name: Check type hints
+        run: |
+          cd backend
+          pip install mypy
+          mypy src/ --ignore-missing-imports || true
