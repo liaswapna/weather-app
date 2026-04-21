@@ -123,6 +123,57 @@ npm start
 
 Frontend will be available at: `http://localhost:3000`
 
+## Docker Setup (Alternative)
+
+### Prerequisites
+- **Docker**: Install from [docker.com](https://www.docker.com/products/docker-desktop)
+- **Docker Compose**: Included with Docker Desktop
+
+### Run with Docker
+
+```bash
+# Navigate to project root
+cd weather-app
+
+# Start both backend and frontend
+docker-compose up
+```
+
+**First run**: Takes 2-5 minutes to build images and install dependencies.
+
+Once you see these messages, both services are ready:
+```
+backend  | Application startup complete
+frontend | [notice] master process started
+```
+
+### Access the Application
+
+- **Frontend**: `http://localhost:3000` (React app in browser)
+- **Backend API**: `http://localhost:8000` (FastAPI server)
+- **Health Check**: `http://localhost:8000/health`
+
+### Stop the Application
+
+In the terminal running `docker-compose up`, press:
+```
+Ctrl + C
+```
+
+### Clean Up (Optional)
+
+Remove stopped containers:
+```bash
+docker-compose down
+```
+
+### Why Docker?
+
+- Consistent environment across machines
+- No need to manually install Python/Node
+- Both backend and frontend run together
+- Same setup as production deployment
+
 ## API Documentation
 
 ### Endpoints

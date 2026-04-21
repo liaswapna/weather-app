@@ -1,0 +1,15 @@
+node_modules/
+npm-debug.log*
+.git/
+.gitignore
+.env
+.env.local
+.env.production
+build/
+.DS_Store
+README.md
+.vscode/
+.idea/
+coverage/
+*.test.tsx
+*.test.ts
