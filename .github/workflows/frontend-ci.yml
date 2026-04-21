@@ -28,15 +28,15 @@ jobs:
           cd frontend
           npm install
 
+      - name: Run linting (ESLint)
+        run: |
+          cd frontend
+          npm run lint || true
+
       - name: Run tests
         run: |
           cd frontend
           npm run test:ci
-
-      - name: Build
-        run: |
-          cd frontend
-          npm run build
 
       - name: Build
         run: |
